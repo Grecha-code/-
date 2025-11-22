@@ -1,11 +1,15 @@
 import time
 from datetime import datetime
+import re
+from PIL import Image
 
 print(datetime.now())
 
 current_hour = datetime.now().hour
 if current_hour >= 20 or current_hour < 10:
     print("Мы сейчас закрыты! Приходите завтра с 10:00 до 20:00😊")
+else:
+    print("Мы работем до 20:00! Успейте всё заказать😊")
 
 money = 0
 Adult = False
@@ -20,6 +24,7 @@ all_sushi = ["1) Суши сяке (30гр): Лосось, Рис | 150р", "2) 
 soups = ["1) Том Ям | 750р"]
 woks = ["1) Вок с курицей | 300р", "2) Вок с говядиной | 350р", "3) Вок с креветками | 500р"]
 custom_rolls = ["Творожный сыр | + 80р", "Огурец | + 30р", "Авакадо | + 50р", "Креветки | 140р", "Лосось | 180р"]
+children_menu = ["1) Филадельфия Лайт", "2) Рис с курицей террияки", "3) Корн дог"]
 
 print("=" * 50)
 print('Доставка еды из морепродуктов "Мать Габена"')
@@ -27,11 +32,37 @@ print("=" * 50)
 print()
 
 print("🧑‍💻Вход в приложение")
+def message_data():
+    email = input("Введите вашу электронную почту: ")
+    phone = input("Введите ваш номер телефона: ")
+    pattern_email = r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2}$"
+    pattern_phone = r"^\+?\d{10,15}$"
+    if re.match(pattern_email, email) is not None and re.match(pattern_phone, phone) is not None:
+        print("Данные корректны")
+        with open('file.json', 'a', encoding='utf-8') as file:
+            file.write(f"Телефон: {phone}, Почта: {email}\n")
+        print("Данные сохранены!")
+    else:
+        print("Данные не корректны")
+        exit()
+message_data()
 name = input("Введите ваше имя: ")
 last_name = input("Введите вашу фамилию: ")
+gender = input("Введите ваш пол (Мужской/Женский): ")
+
+if gender != "Мужской":
+    if gender != "Женский":
+        print("Вы призананы иноагентом!")
+        exit()
+
+with open('file.json', 'a', encoding='utf-8') as file:
+    file.write(f"Имя: {name}, Фамилия: {last_name}, Пол: {gender}\n")
 
 try:
     year_of_birth = int(input("Введите год рождения: "))
+    if year_of_birth < 1900:
+        print("Пожалуйста, зарегестрируйтесь заново. Вы слишком старый!")
+        exit()
     Adult = year_of_birth <= 2007
 except:
     print("Некорректный ввод!")
@@ -57,45 +88,103 @@ def show_header():
     print("=" * 50)
     print('Доставка еды из морепродуктов "Мать Габена"')
     print("=" * 50)
-
-
 def menu():
     global pay
 
     while not pay:
-        show_header()
-        print("🏠Меню")
-        print("Выберите раздел:")
-        print("Роллы == Суши == Супы == Вок == Напитки == Кастом роллы")
-        print('Для оплаты напишите "Оплата"')
-        print('Для выхода напишите "Выход"')
-        choice = input()
+        if not Adult:
+            show_header()
+            print("🏠Меню")
+            print("Выберите раздел:")
+            print("Роллы == Суши == Супы == Вок == Напитки == Кастом роллы == Детское меню")
+            print('Для оплаты напишите "Оплата"')
+            print('Для выхода напишите "Выход"')
+            choice = input()
 
-        if choice == "Кастом роллы":
-            custom_roll()
-        elif choice == "Роллы":
-            roll()
-        elif choice == "Суши":
-            sushi()
-        elif choice == "Супы":
-            soup()
-        elif choice == "Вок":
-            wok()
-        elif choice == "Напитки":
-            drink()
-        elif choice == "Оплата":
-            paying()
-        elif choice == "Выход":
-            print("До свидания!")
-            break
+            if choice == "Кастом роллы":
+                custom_roll()
+            elif choice == "Роллы":
+                roll()
+            elif choice == "Суши":
+                sushi()
+            elif choice == "Супы":
+                soup()
+            elif choice == "Вок":
+                wok()
+            elif choice == "Напитки":
+                drink()
+            elif choice == "Детское меню":
+                children()
+            elif choice == "Оплата":
+                paying()
+            elif choice == "Выход":
+                print("До свидания!")
+                break
+            else:
+                print("Такой команды нет!")
+                input("Нажмите Enter чтобы продолжить")
         else:
-            print("Такой команды нет!")
-            input("Нажмите Enter чтобы продолжить")
+            show_header()
+            print("🏠Меню")
+            print("Выберите раздел:")
+            print("Роллы == Суши == Супы == Вок == Напитки == Кастом роллы")
+            print('Для оплаты напишите "Оплата"')
+            print('Для выхода напишите "Выход"')
+            choice = input()
 
+            if choice == "Кастом роллы":
+                custom_roll()
+            elif choice == "Роллы":
+                roll()
+            elif choice == "Суши":
+                sushi()
+            elif choice == "Супы":
+                soup()
+            elif choice == "Вок":
+                wok()
+            elif choice == "Напитки":
+                drink()
+            elif choice == "Оплата":
+                paying()
+            elif choice == "Выход":
+                print("До свидания!")
+                break
+            else:
+                print("Такой команды нет!")
+                input("Нажмите Enter чтобы продолжить")
+
+def children():
+    global money, dishes, children_menu
+
+    while True:
+        show_header()
+        print("Вот весь выбор блюд:")
+        print(*children_menu)
+        print("4) Выход в меню")
+
+        try:
+            type = int(input("Введите номер желаемого блюда: "))
+        except:
+            print("Пожалуйста, введите число!")
+            input("Нажмите Enter чтобы продолжить")
+            continue
+
+        if type == 4:
+            break
+        elif type >= 1 or type <= 3:
+            dishes.append(children_menu[type-1])
+            prices = [500, 500, 500]
+            money += prices[type - 1]
+            print(f"Добавлено: {children_menu[type - 1]}")
+        else:
+            print("Неверный номер!")
+
+        input("Нажмите Enter чтобы продолжить")
 
 def roll():
     global money, dishes
-
+    img = Image.open("Rolls.jpg")
+    img.show()
     while True:
         show_header()
         print("Вот весь выбор роллов:")
@@ -187,7 +276,8 @@ def soup():
 
 def wok():
     global money, dishes
-
+    img = Image.open("vok.jpg")
+    img.show()
     while True:
         show_header()
         print("Вот весь выбор вок:")
@@ -276,6 +366,7 @@ def custom_roll():
         show_header()
         print("Создайте свои роллы!")
         print("Ингредиенты:")
+
         for i, j in enumerate(custom_rolls, 1):
             print(f"{i}) {j}")
         print("6) Выход в меню")
@@ -302,6 +393,7 @@ def custom_roll():
         input("Нажмите Enter чтобы продолжить")
     dishes.append("Стандартное наполнение ролла (нори, рис)")
 
+
 def paying():
     global pay, money, dishes
 
@@ -318,6 +410,15 @@ def paying():
     delivery_type = input().strip()
 
     original_money = money
+
+    if year_of_birth <= 1960 and gender == "Мужской":
+        discount_2 = money // 10
+        money -= discount_2
+        print(f"Вы получили пенсионную скидку скидку 10%: -{discount_2}р")
+    elif year_of_birth <= 1965 and gender == "Женский":
+        discount_2 = money // 10
+        money -= discount_2
+
     if delivery_type == "Самовывоз":
         discount = money // 10
         money -= discount
@@ -325,6 +426,8 @@ def paying():
     elif delivery_type == "Доставка":
         address = input("Введите адрес доставки: ")
         print(f"Доставка по адресу: {address}")
+        with open('file.json', 'a', encoding='utf-8') as file:
+            file.write(f"Адрес: {address}\n")
     else:
         print("Неверный тип доставки!")
         pay = False
