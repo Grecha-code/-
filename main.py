@@ -1,7 +1,6 @@
 import time
 from datetime import datetime
 import re
-from PIL import Image
 
 print(datetime.now())
 
@@ -32,6 +31,8 @@ print("=" * 50)
 print()
 
 print("🧑‍💻Вход в приложение")
+with open('file.json', 'a', encoding='utf-8') as file:
+    file.write("{\n")
 def message_data():
     email = input("Введите вашу электронную почту: ")
     phone = input("Введите ваш номер телефона: ")
@@ -40,7 +41,7 @@ def message_data():
     if re.match(pattern_email, email) is not None and re.match(pattern_phone, phone) is not None:
         print("Данные корректны")
         with open('file.json', 'a', encoding='utf-8') as file:
-            file.write(f"Телефон: {phone}, Почта: {email}\n")
+            file.write(f'   "Телефон: {phone}", Почта: {email}"\n')
         print("Данные сохранены!")
     else:
         print("Данные не корректны")
@@ -56,7 +57,7 @@ if gender != "Мужской":
         exit()
 
 with open('file.json', 'a', encoding='utf-8') as file:
-    file.write(f"Имя: {name}, Фамилия: {last_name}, Пол: {gender}\n")
+    file.write(f'"Имя: {name}, Фамилия: {last_name}, Пол: {gender}\n"')
 
 try:
     year_of_birth = int(input("Введите год рождения: "))
@@ -67,6 +68,8 @@ try:
 except:
     print("Некорректный ввод!")
     exit()
+with open('file.json', 'a', encoding='utf-8') as file:
+    file.write("}\n")
 
 if Adult:
     print(
@@ -183,8 +186,6 @@ def children():
 
 def roll():
     global money, dishes
-    img = Image.open("Rolls.jpg")
-    img.show()
     while True:
         show_header()
         print("Вот весь выбор роллов:")
@@ -276,8 +277,7 @@ def soup():
 
 def wok():
     global money, dishes
-    img = Image.open("vok.jpg")
-    img.show()
+
     while True:
         show_header()
         print("Вот весь выбор вок:")
